@@ -2,7 +2,7 @@ public with sharing class MaintenanceRequestHelper {
     public static void createNewRequests(List<Case> nonUpdatedMtRequests) {
         List<Case> newMtRequests = new List<Case>(); // Case list used to store newly created Maintanance Requests
         List<Id> validIds = new List<Id>(); // Id list for store filtered non closed status request Id's before update
-        Map<Id, Decimal> mtCycles = new Map<Id, Decimal>(); // Map for closed status request Id's and related min maintanance cycles
+        Map<Id, Integer> mtCycles = new Map<Id, Integer>(); // Map for closed status request Id's and related min maintanance cycles
 
         // BEGIN - Get the non-closed status Id's before update
         for(Case mRequest : nonUpdatedMtRequests) {
@@ -32,7 +32,7 @@ public with sharing class MaintenanceRequestHelper {
         ];
 
         for(AggregateResult mtItem : mtItems) {
-            mtCycles.put((Id)mtItem.get('Maintenance_Request__c'), (Decimal)mtItem.get('cycle'));
+            mtCycles.put((Id)mtItem.get('Maintenance_Request__c'), (Integer)mtItem.get('cycle'));
         }
         // END - Get the minmum maintainance cycles for closed status Id's
 
@@ -44,7 +44,7 @@ public with sharing class MaintenanceRequestHelper {
                 Type = 'Routine Maintenance',
                 Vehicle__c = closedMtRqs.get(closedCaseId).Vehicle__c,
                 Date_Reported__c = Date.Today(),
-                Date_Due__c = Date.Today().addDays((Integer) mtCycles.get(closedCaseId))
+                Date_Due__c = Date.Today().addDays(mtCycles.get(closedCaseId))
             );
             newMtRequests.add(newCase);
         }
