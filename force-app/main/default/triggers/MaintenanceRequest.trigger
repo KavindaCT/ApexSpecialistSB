@@ -1,3 +1,3 @@
 trigger MaintenanceRequest on Case (after update) {
-    MaintenanceRequestHelper.createNewRequests(Trigger.new);
+    MaintenanceRequestHelper.createNewRequests(Trigger.old);
 }
