@@ -37,14 +37,14 @@ public with sharing class MaintenanceRequestHelper {
         // END - Get the minmum maintainance cycles for closed status Id's
 
         // BEGIN - Create new maintainance requests
-        for(Case closedCase : closedMtRqs) {
+        for(Id closedCaseId : closedMtRqs.keySet()) {
             Case newCase = new Case(
                 Status = 'New',
                 Subject = 'Routine Maintenance',
                 Type = 'Routine Maintenance',
-                Vehicle__c = closedCase.Vecicle__c,
+                Vehicle__c = closedMtRqs.get(closedCaseId).Vehicle__c,
                 Date_Reported__c = Date.Today(),
-                Date_Due__c = Date.Today().addDays(mtCycles.get(closedCase.Id))
+                Date_Due__c = Date.Today().addDays((Integer) mtCycles.get(closedCaseId))
             );
             newMtRequests.add(newCase);
         }
