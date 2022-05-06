@@ -1,25 +1,25 @@
 public with sharing class MaintenanceRequestHelper {
-    public static void createNewRequests(List<Case> updatedMtRequests) {
+    public static void createNewRequests(List<Case> nonUpdatedMtRequests) {
         List<Case> newMtRequests = new List<Case>(); // Case list used to store newly created Maintanance Requests
-        List<Id> closedIds = new List<Id>(); // Id list for store filtered closed status request Id's
+        List<Id> validIds = new List<Id>(); // Id list for store filtered non closed status request Id's before update
         Map<Id, Decimal> mtCycles = new Map<Id, Decimal>(); // Map for closed status request Id's and related min maintanance cycles
 
-        // BEGIN - Get the closed status Id's
-        for(Case mRequest : updatedMtRequests) {
-            if(mRequest.Status == 'Closed') {
-                if (mRequest.type == 'Repair' || mRequest.type == 'Routine Maintenance') {
-                    closedIds.add(mRequest.Id);
+        // BEGIN - Get the non-closed status Id's before update
+        for(Case mRequest : nonUpdatedMtRequests) {
+            if(mRequest.Status != 'Closed') {
+                if (mRequest.Type == 'Repair' || mRequest.Type == 'Routine Maintenance') {
+                    validIds.add(mRequest.Id);
                 }
             }
         }
-        // END - Get the closed status Id's
+        // END - Get the non-closed status Id's before update
 
         // BEGIN - Get ID Case map of closed maintanance req's
         Map<Id, Case> closedMtRqs = new Map<Id, Case>([
             SELECT Id, Vehicle__c, Subject, Status, Type,
             (SELECT Id, Equipment__c, Quantity__c FROM Equipment_Maintenance_Items__r)
             FROM Case
-            WHERE Id IN :closedIds
+            WHERE Id IN :validIds AND Status = 'Closed'
         ]);
         // END - Get ID Case map of closed maintanance req's
 
@@ -27,7 +27,7 @@ public with sharing class MaintenanceRequestHelper {
         List<AggregateResult> mtItems = [
             SELECT Maintenance_Request__c, MIN(Equipment__r.Maintenance_Cycle__c)cycle
             FROM Equipment_Maintenance_Item__c
-            WHERE Maintenance_Request__c IN :closedIds
+            WHERE Maintenance_Request__c IN :validIds
             GROUP BY Maintenance_Request__c
         ];
 
@@ -43,11 +43,13 @@ public with sharing class MaintenanceRequestHelper {
                 Subject = 'Routine Maintenance',
                 Type = 'Routine Maintenance',
                 Vehicle__c = closedCase.Vecicle__c,
-                Date_Reported__c = Date.Today()
+                Date_Reported__c = Date.Today(),
+                Date_Due__c = Date.Today().addDays(mtCycles.get(closedCase.Id))
             );
-
-            
+            newMtRequests.add(newCase);
         }
+
+        insert newMtRequests;
         // BEGIN - Create new maintainance requests
     }
 }
