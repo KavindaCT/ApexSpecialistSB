@@ -3,7 +3,7 @@ public with sharing class MaintenanceRequestHelper {
         List<Case> newMtRequests = new List<Case>(); // Case list used to store newly created Maintanance Requests
         List<Id> validIds = new List<Id>(); // Id list for store filtered non closed status request Id's before update
         Map<Id, Decimal> mtCycles = new Map<Id, Decimal>(); // Map for closed status request Id's and related min maintanance cycles
-        List<Equipment_Maintenance_Items__c> newMtRqItems = new List<Equipment_Maintenance_Items__c>(); // List for store related Maintainance items for new maintainance requests
+        List<Equipment_Maintenance_Item__c> newMtRqItems = new List<Equipment_Maintenance_Item__c>(); // List for store related Maintainance items for new maintainance requests
 
         // BEGIN - Get the non-closed status Id's before update
         for(Case mRequest : nonUpdatedMtRequests) {
@@ -57,8 +57,8 @@ public with sharing class MaintenanceRequestHelper {
 
         // BEGIN - Create related Maintanance Req Items for new cases
         for(Case newMtRq : newMtRequests) {
-            for(Equipment_Maintenance_Items__c rqItem : closedMtRqs.get(newMtRq.ParentId).Equipment_Maintenance_Items__r) {
-                Equipment_Maintenance_Items__c newRqItem = rqItem.clone();
+            for(Equipment_Maintenance_Item__c rqItem : closedMtRqs.get(newMtRq.ParentId).Equipment_Maintenance_Items__r) {
+                Equipment_Maintenance_Item__c newRqItem = rqItem.clone();
                 newRqItem.Maintenance_Request__c = newMtRq.Id;
 
                 newMtRqItems.add(newRqItem);
