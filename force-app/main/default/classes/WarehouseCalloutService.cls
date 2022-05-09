@@ -32,7 +32,7 @@ public with sharing class WarehouseCalloutService implements Queueable {
                     Maintenance_Cycle__c = (Integer) equipment.get('maintenanceperiod'),
                     Lifespan_Months__c = (Integer) equipment.get('lifespan'),
                     Cost__c = (Integer) equipment.get('cost'),
-                    Warehouse_SKU__c = (Integer) equipment.get('sku')
+                    Warehouse_SKU__c = (String) equipment.get('sku')
                 );
                 existingEquipments.add(newEquipment);
             }
