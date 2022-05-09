@@ -1,4 +1,4 @@
-public with sharing class WarehouseCalloutService implements Queueable {
+public with sharing class WarehouseCalloutService implements Queueable, Database.AllowsCallouts {
     // BEGIN - Method for callout to warehouse
     private HttpResponse getEquipmentList(String endPoint) {
         Http http = new Http(); // Creates new HTTP
@@ -25,7 +25,6 @@ public with sharing class WarehouseCalloutService implements Queueable {
             for(Object eqp : equipments) {
                 Map<String, Object> equipment = (Map<String, Object>) eqp;
                 Product2 newEquipment = new Product2(
-                    Id = (Id) equipment.get('_id'),
                     Name = (String) equipment.get('name'),
                     Replacement_Part__c = (Boolean) equipment.get('replacement'),
                     Current_Inventory__c = (Integer) equipment.get('quantity'),
@@ -36,7 +35,7 @@ public with sharing class WarehouseCalloutService implements Queueable {
                 );
                 existingEquipments.add(newEquipment);
             }
-            upsert existingEquipments;
+            upsert existingEquipments Warehouse_SKU__c;
         }
     }
 }
