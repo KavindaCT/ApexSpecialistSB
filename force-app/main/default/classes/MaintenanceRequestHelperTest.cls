@@ -90,6 +90,23 @@ private class MaintenanceRequestHelperTest {
     }
 
     @isTest static void testRecordCreationNegative() {
+        List<Case> mtRequests = [
+            SELECT Id, Status, Type, Origin, Subject
+            FROM Case
+        ]; // Get all the new maintainance requests
+        
+        for(Case mtRequest : mtRequests) {
+            mtRequest.Type = 'Other';
+            mtRequest.Origin = 'Phone';
+            mtRequest.Subject = 'Test';
+        }
 
+        update mtRequests;
+
+        List<Case> newMtRequests = [
+            SELECT Id, Status, Type FROM Case WHERE Type = 'Routine Maintenance' AND ParentId IN :mtRequests
+        ];
+
+        System.assertEquals(0, newMtRequests.size()); // Checks that closed maintainance requests create new requests
     }
 }
