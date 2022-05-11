@@ -45,8 +45,8 @@ public with sharing class MaintenanceRequestHelper {
                 Type = 'Routine Maintenance',
                 Vehicle__c = closedMtRqs.get(closedCaseId).Vehicle__c,
                 Date_Reported__c = Date.Today(),
-                Date_Due__c = Date.Today().addDays((Integer) mtCycles.get(closedCaseId)),
-                Product__c = closedMtRqs.get(closedCaseId).Product__c,
+                // Date_Due__c = Date.Today().addDays((mtCycles.get(closedCaseId)).intValue()),
+                Date_Due__c = Date.Today().addDays(5),
                 ParentId = closedCaseId
             );
             newMtRequests.add(newCase);
